@@ -21,3 +21,12 @@
     - mysql 实现mysql服务
 
     - util 实现工具类
+
+## 第三方包依赖
+    - [sqlx](https://github.com/jmoiron/sqlx)
+    - [sqlmock](https://github.com/DATA-DOG/go-sqlmock)
+    - [logrus](https://github.com/sirupsen/logrus)
+    - [go-jwt](https://github.com/dgrijalva/jwt-go)
+    - [httprouter](https://github.com/julienschmidt/httprouter)
+    - [go-mssqldb](https://github.com/denisenkom/go-mssqldb)
+    - [go-mysql](https://github.com/go-sql-driver/mysql)
