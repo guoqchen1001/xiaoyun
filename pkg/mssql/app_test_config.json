@@ -1,0 +1,11 @@
+{
+    "mssql":{
+        "parm": "sqlserver://sa:123@localhost:1433?database=zbhb" 
+    },
+    "http":{
+        "host":":8088"
+    },
+    "auth":{
+        "secret":"kmtech"
+    }
+}

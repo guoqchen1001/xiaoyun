@@ -1,0 +1,14 @@
+{
+    "mssql":{
+        "parm": "sqlserver://sa:123@127.0.0.1:1433?database=zbhb" 
+    },
+    "mysql": {
+        "parm": "root:guoqchen@/xiaoyun?charset=utf8&parseTime=True&loc=Local"
+    },
+    "http":{
+        "host":":9099"
+    },
+    "auth":{
+        "secret":"kmtech"
+    }
+}
