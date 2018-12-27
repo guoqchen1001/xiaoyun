@@ -2,7 +2,6 @@ package http
 
 import (
 	"net/http"
-	"net/url"
 	root "xiaoyun/pkg"
 
 	"github.com/julienschmidt/httprouter"
@@ -46,24 +45,4 @@ func (h *GoodsHandler) HandleGetGoods(w http.ResponseWriter, r *http.Request, p 
 		encodeJSON(w, g, h.log)
 	}
 
-}
-
-// GoodsService 商品服务的http实现，相当于利用http获取商品数据
-type GoodsService struct {
-	URL *url.URL
-}
-
-// Goods 返回引用
-func (s *GoodsService) Goods() (*http.Request, error) {
-
-	s.URL = &url.URL{}
-	u := s.URL
-	u.Path = "/api/goods/"
-
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
 }

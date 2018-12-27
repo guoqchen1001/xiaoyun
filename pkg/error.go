@@ -36,19 +36,32 @@ const (
 	ECONFIGAUTHNOTFOUND  = "config_auth_not_found"  // auth配置不存在
 )
 
-// 数据库错误
+// 服务验证错误
 const (
 	ESERVICEWITHNILSESSION = "service_with_nil_session" // session对象为空
 	ESERVICEWITHNILDB      = "service_with_nil_db"      // 数据库对象为空
-	EDBQUERYERROR          = "db_query_error"           // 数据库查询错误
-	EDBBEGINERROR          = "db_begin_error"           // 数据库开始事务错误
-	EDBPREPAREERROR        = "db_prepare_error"         // 数据库准备stmt失败
-	EDBEXECERROR           = "db_exec_error"            // 数据库语执行错误
-	EDBOPENERROR           = "db_open_error"            // 数据库打开失败
+	ESERVICEWITHNILCRYPTO  = "service_with_nil_crypto"  // 空的加密对象
+)
+
+// 数据库错误
+const (
+	EDBQUERYERROR   = "db_query_error"   // 数据库查询错误
+	EDBBEGINERROR   = "db_begin_error"   // 数据库开始事务错误
+	EDBPREPAREERROR = "db_prepare_error" // 数据库准备stmt失败
+	EDBEXECERROR    = "db_exec_error"    // 数据库语执行错误
+	EDBOPENERROR    = "db_open_error"    // 数据库打开失败
 )
 
 //EAUTHERROR token解析错误
 const EAUTHERROR = "auth_error" // 身份验证错误
+// ECRYPTOERROR 解加密错误
+const ECRYPTOERROR = "crypto_error" // 加密解密错误
+
+// http错误
+const (
+	ENILREQUESTBODY = "nil_request_body" // 空请求体
+	ENILSERVICE     = "nil_service"      // 空服务
+)
 
 // Error 实现错误接口
 func (e *Error) Error() string {

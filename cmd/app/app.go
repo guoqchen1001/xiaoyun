@@ -2,6 +2,7 @@ package main
 
 import (
 	root "xiaoyun/pkg"
+	"xiaoyun/pkg/crypto"
 	"xiaoyun/pkg/http"
 	"xiaoyun/pkg/jwt"
 	"xiaoyun/pkg/mssql"
@@ -19,6 +20,7 @@ type App struct {
 	clientMysql *mysql.Client      // mysql连接对象
 	handler     *http.Handler      // http处理器
 	sever       *http.Server       // http服务
+	crypto      *crypto.Crypto     // 加密服务
 
 	sessionMssql *mssql.Session
 	sessionMysql *mysql.Session
@@ -33,6 +35,7 @@ func (a *App) SetEnv(env *Env) {
 // Initialize 初始化
 func (a *App) Initialize() {
 
+	a.initializeCrypto()
 	a.initializeAuth()
 	a.initializeMssql()
 	a.initializeMysql()
@@ -65,6 +68,12 @@ func (a *App) initializeAuth() {
 
 }
 
+// 初始化加密服务
+func (a *App) initializeCrypto() {
+	crypto := crypto.NewCrypto()
+	a.crypto = crypto
+}
+
 // 初始化mssql对象
 func (a *App) initializeMssql() {
 	// mssql数据库单次链接
@@ -76,8 +85,8 @@ func (a *App) initializeMssql() {
 func (a *App) initializeMysql() {
 	client := mysql.NewClient(a.configer)
 	client.Authenticator = a.auth
+	client.Crypto = a.crypto.MD5Crypto()
 	a.clientMysql = client
-
 }
 
 // 初始化http处理器对象
@@ -99,5 +108,6 @@ func (a *App) initializeService() {
 
 	a.handler.GoodsHandler.GoodsService = a.sessionMssql.GoodsService()
 	a.handler.GoodsImageHandler.GoodsImageService = a.sessionMysql.GoodsImageService()
+	a.handler.UserHandler.UserService = a.sessionMysql.UserService()
 
 }

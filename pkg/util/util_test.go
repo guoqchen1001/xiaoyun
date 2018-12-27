@@ -40,3 +40,21 @@ func TestFileExists(t *testing.T) {
 	}
 
 }
+
+func TestReverseString(t *testing.T) {
+
+	s := "123456789asdfghjklqwertyuiopzxcvbnm"
+
+	rS := util.ReverseString(s)
+	rrS := util.ReverseString(rS)
+
+	if rrS != s {
+		t.Errorf("反转字符串预期不符，期待[%s], 实际[%s]", s, rrS)
+	}
+
+	s = "qwerty"
+	rS = util.ReverseString(s)
+	if rS != "ytrewq" {
+		t.Errorf("反转字符串预期不符，期待[%s], 实际[%s]", "ytrewq", rS)
+	}
+}

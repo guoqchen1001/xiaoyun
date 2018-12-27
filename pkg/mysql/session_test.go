@@ -7,6 +7,7 @@ import (
 	"testing"
 	root "xiaoyun/pkg"
 	"xiaoyun/pkg/mysql"
+	"xiaoyun/pkg/util"
 
 	"github.com/jmoiron/sqlx"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
@@ -32,11 +33,8 @@ func NewMockSession() (MockSession, error) {
 
 	mysqlSession := mysql.NewSession(sqlxDB)
 
-	var authenticator Authenticator
-	authenticator.authFn = func(token string) (*root.User, error) {
-		return &root.User{}, nil
-	}
-	mysqlSession.Authenticator = &authenticator
+	mysqlSession.SetAuthenticator(getMockAuthenticator())
+	mysqlSession.SetCrypto(getMockCrypto())
 
 	mockSession.sqlxDB = sqlxDB
 	mockSession.mock = mock
@@ -45,6 +43,12 @@ func NewMockSession() (MockSession, error) {
 
 	return mockSession, nil
 
+}
+
+// Close 关闭模拟数据库连接
+func (s MockSession) Close() {
+	s.mockDB.Close()
+	s.sqlxDB.Close()
 }
 
 type Authenticator struct {
@@ -58,6 +62,19 @@ func (a *Authenticator) Authenticate(token string) (*root.User, error) {
 
 func (a *Authenticator) Token(user *root.User) (string, error) {
 	return a.tokenFn(user)
+}
+
+// 获取测试用身份验证
+func getMockAuthenticator() *Authenticator {
+	var authenticator Authenticator
+	authenticator.authFn = func(token string) (*root.User, error) {
+		return &root.User{}, nil
+	}
+
+	authenticator.tokenFn = func(user *root.User) (string, error) {
+		return user.No + user.Name, nil
+	}
+	return &authenticator
 }
 
 func TestSession_Authenticate(t *testing.T) {
@@ -88,7 +105,7 @@ func TestSession_Authenticate(t *testing.T) {
 		return &user, nil
 	}
 
-	mockSession.mysqlSession.Authenticator = &authenticator
+	mockSession.mysqlSession.SetAuthenticator(&authenticator)
 
 	mockSession.mysqlSession.SetAuthToken("123")
 
@@ -123,11 +140,43 @@ func TestSession_AuthenticateError(t *testing.T) {
 		return nil, errors.New("auth_err")
 	}
 
-	mockSession.mysqlSession.Authenticator = &authenticator
+	mockSession.mysqlSession.SetAuthenticator(&authenticator)
 
 	_, err = mockSession.mysqlSession.Authenticate("123")
 	if root.ErrorCode(err) != root.EAUTHERROR {
 		t.Errorf("错误码不符合预期，预期[%s]，实际[%s]", root.EAUTHERROR, root.ErrorCode(err))
 	}
+
+}
+
+type Crypto struct {
+	saltFn    func(s string) (string, error)
+	compareFn func(hash string, s string) (bool, error)
+}
+
+// Salt 实现root.Salt接口
+func (c *Crypto) Salt(s string) (string, error) {
+	return c.saltFn(s)
+}
+
+// Compare 实现root.Compare接口
+func (c *Crypto) Compare(hash string, s string) (bool, error) {
+	return c.compareFn(hash, s)
+}
+
+// 获取测试用加密
+func getMockCrypto() *Crypto {
+
+	var crypto Crypto
+
+	crypto.saltFn = func(s string) (string, error) {
+		return util.ReverseString(s), nil
+	}
+
+	crypto.compareFn = func(hash string, s string) (bool, error) {
+		return hash == util.ReverseString(s), nil
+	}
+
+	return &crypto
 
 }

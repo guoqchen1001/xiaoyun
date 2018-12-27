@@ -14,6 +14,7 @@ type Client struct {
 	Now           func() time.Time
 	Configer      root.Configer
 	Authenticator root.Authenticator
+	Crypto        root.Crypto
 }
 
 // NewClient 生成数据路客户端
@@ -29,7 +30,8 @@ func NewClient(configer root.Configer) *Client {
 func (c *Client) Connect() *Session {
 
 	s := NewSession(c.db)
-	s.Authenticator = c.Authenticator
+	s.SetAuthenticator(c.Authenticator)
+	s.SetCrypto(c.Crypto)
 	s.now = c.Now()
 	return s
 

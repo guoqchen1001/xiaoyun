@@ -12,11 +12,14 @@ type Session struct {
 	db  *sqlx.DB
 	now time.Time
 
-	Authenticator root.Authenticator
+	authenticator root.Authenticator
 	authToken     string
 	user          *root.User
 
+	crypto root.Crypto
+
 	goodsImageService GoodsImageService
+	userService       UserService
 }
 
 // NewSession 创建数据库连接
@@ -24,6 +27,7 @@ func NewSession(db *sqlx.DB) *Session {
 	s := &Session{db: db}
 
 	s.goodsImageService.session = s
+	s.userService.session = s
 
 	return s
 }
@@ -43,7 +47,7 @@ func (s *Session) Authenticate(token string) (*root.User, error) {
 		return s.user, nil
 	}
 
-	user, err := s.Authenticator.Authenticate(token)
+	user, err := s.authenticator.Authenticate(token)
 	if err != nil {
 		customErr.Code = root.EAUTHERROR
 		customErr.Err = err
@@ -56,7 +60,22 @@ func (s *Session) Authenticate(token string) (*root.User, error) {
 
 }
 
-// GoodsImageService 实现商品保存接口
+// GoodsImageService 返回goodsImageService
 func (s *Session) GoodsImageService() root.GoodsImageService {
 	return &s.goodsImageService
+}
+
+// UserService 返回userService
+func (s *Session) UserService() root.UserService {
+	return &s.userService
+}
+
+// SetAuthenticator 设置身份验证
+func (s *Session) SetAuthenticator(auth root.Authenticator) {
+	s.authenticator = auth
+}
+
+// SetCrypto 设置加密服务
+func (s *Session) SetCrypto(crypto root.Crypto) {
+	s.crypto = crypto
 }

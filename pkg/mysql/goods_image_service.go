@@ -47,7 +47,7 @@ func (s *GoodsImageService) CreateGoodsImage(goodsImage *root.GoodsImage) error 
 	customErr := root.Error{Op: op}
 
 	token := goodsImage.Token
-	user, err := s.session.Authenticator.Authenticate(token)
+	user, err := s.session.authenticator.Authenticate(token)
 	if err != nil {
 		customErr.Err = err
 		customErr.Code = root.EAUTHERROR

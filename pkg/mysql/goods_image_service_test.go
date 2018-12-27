@@ -235,7 +235,7 @@ func TestCreateGoodsImage_AuthError(t *testing.T) {
 		return nil, errors.New("auth_error")
 	}
 
-	mockSession.mysqlSession.Authenticator = &authenticator
+	mockSession.mysqlSession.SetAuthenticator(&authenticator)
 
 	goodsImage := getGoodsImage(2)
 	service := mockSession.mysqlSession.GoodsImageService()

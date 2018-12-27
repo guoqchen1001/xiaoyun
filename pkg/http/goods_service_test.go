@@ -30,21 +30,13 @@ func TestGetGoods_goods(t *testing.T) {
 	handler := http.NewHandler(log)
 	handler.GoodsHandler.GoodsService = &mockService
 
-	client := http.NewClient()
-	goodService := client.GoodsService()
-
-	req, err := goodService.Goods()
-	if err != nil {
-		t.Error(err)
-	}
-
+	req := httptest.NewRequest("GET", "/api/goods/", nil)
 	rr := httptest.NewRecorder()
-
 	params := httprouter.Params{}
 	handler.GoodsHandler.HandleGetGoods(rr, req, params)
 
 	respGoods := root.Goods{}
-	err = json.NewDecoder(rr.Body).Decode(&respGoods)
+	err := json.NewDecoder(rr.Body).Decode(&respGoods)
 	if err != nil {
 		t.Error(err)
 	}
@@ -69,14 +61,7 @@ func TestGetGoods_NotFound(t *testing.T) {
 	// 创建response
 	rr := httptest.NewRecorder()
 	// 创建客户端
-	client := http.NewClient()
-	goodsService := client.GoodsService()
-	// 获取返回值
-	req, err := goodsService.Goods()
-
-	if err != nil {
-		t.Error(err)
-	}
+	req := httptest.NewRequest("GET", "/api/goods/", nil)
 	params := httprouter.Params{
 		httprouter.Param{
 			Key:   "no",
@@ -104,14 +89,7 @@ func TestGetGoods_InternalError(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
-	client := http.NewClient()
-	goodService := client.GoodsService()
-
-	req, err := goodService.Goods()
-	if err != nil {
-		t.Error(err)
-	}
-
+	req := httptest.NewRequest("GET", "/api/goods/", nil)
 	parms := httprouter.Params{
 		httprouter.Param{
 			Key:   "no",

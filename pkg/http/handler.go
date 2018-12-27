@@ -12,23 +12,30 @@ type Handler struct {
 	Log               *root.Log
 	GoodsHandler      *GoodsHandler
 	GoodsImageHandler *GoodsImageHandler
+	UserHandler       *UserHandler
 }
 
 // NewHandler 创建新的处理器
 func NewHandler(log *root.Log) *Handler {
 	h := &Handler{Log: log}
-	h.InitHandler()
+	h.initHandler()
 	return h
 }
 
-// InitHandler 初始化处理器函数
-func (h *Handler) InitHandler() {
+// initHandler 初始化处理器函数
+func (h *Handler) initHandler() {
 
+	// 商品服务
 	h.GoodsHandler = NewGoodsHandler()
 	h.GoodsHandler.log = h.Log
 
+	// 商品图片服务
 	h.GoodsImageHandler = NewGoodsImageHandler()
 	h.GoodsImageHandler.log = h.Log
+
+	// 用户服务
+	h.UserHandler = NewUserHandler()
+	h.UserHandler.log = h.Log
 }
 
 // ServeHTTP 开启http服务
@@ -36,8 +43,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasPrefix(r.URL.Path, "/api/goods") {
 		h.GoodsHandler.ServeHTTP(w, r)
-	} else if strings.HasPrefix(r.URL.Path, "/api/image/goods") {
+	} else if strings.HasPrefix(r.URL.Path, "/api/image") {
 		h.GoodsImageHandler.ServeHTTP(w, r)
+	} else if strings.HasPrefix(r.URL.Path, "/api/user") {
+		h.UserHandler.ServeHTTP(w, r)
 	} else {
 		http.NotFound(w, r)
 	}
@@ -72,13 +81,25 @@ type errorResponse struct {
 
 // encodeJson json解析，解析错误时返回内部错误
 func encodeJSON(w http.ResponseWriter, v interface{}, log *root.Log) {
-	if err := json.NewEncoder(w).Encode(v); err != nil {
+
+	response, err := json.Marshal(v)
+	log.Logger.Info(string(response))
+	if err != nil {
 		Error(w, err, http.StatusInternalServerError, log)
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(response)
 }
 
 // NotFound 未找到记录处理.
 func NotFound(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte(`{}` + "\n"))
+}
+
+// JSONWithCookie 返回json，写入cookie
+func JSONWithCookie(w http.ResponseWriter, v interface{}, cookie http.Cookie, log *root.Log) {
+	encodeJSON(w, v, log)
+	http.SetCookie(w, &cookie)
 }
