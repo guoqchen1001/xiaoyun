@@ -8,8 +8,9 @@ type MssqlConfig struct {
 
 // MysqlConfig mysql数据库连接
 type MysqlConfig struct {
-	Dialects string `json:"dialects"`
-	Parm     string `json:"parm"`
+	Dialects   string `json:"dialects"`
+	Parm       string `json:"parm"`
+	Migrations string `json:"migrations"`
 }
 
 // HTTPConfig http服务设置

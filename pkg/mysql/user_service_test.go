@@ -352,7 +352,7 @@ func TestUser_AuthError(t *testing.T) {
 
 	columns := []string{"no", "password"}
 	rows := sqlmock.NewRows(columns).
-		AddRow("0001", "1000")
+		AddRow("0001", "10001000")
 
 	session.mock.ExpectQuery("SELECT (.+) FROM users WHERE").WithArgs(credentials.UserName).WillReturnRows(rows)
 

@@ -54,6 +54,12 @@ func (a *App) Run() error {
 	if err := a.clientMysql.Open(); err != nil {
 		return err
 	}
+
+	err := a.clientMysql.Migrate(a.log)
+	if err != nil {
+		return err
+	}
+
 	defer a.clientMysql.Close()
 
 	a.initializeService()

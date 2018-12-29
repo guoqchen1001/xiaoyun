@@ -83,7 +83,6 @@ type errorResponse struct {
 func encodeJSON(w http.ResponseWriter, v interface{}, log *root.Log) {
 
 	response, err := json.Marshal(v)
-	log.Logger.Info(string(response))
 	if err != nil {
 		Error(w, err, http.StatusInternalServerError, log)
 	}
