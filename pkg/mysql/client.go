@@ -87,6 +87,10 @@ func (c *Client) Close() error {
 // Migrate 数据库迁移
 func (c *Client) Migrate(log *root.Log) error {
 
+	if c.db == nil {
+		return nil
+	}
+
 	config, err := c.Configer.GetConfig()
 	if err != nil {
 		return err
