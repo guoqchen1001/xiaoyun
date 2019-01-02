@@ -16,7 +16,7 @@ type Session struct {
 	authToken     string
 	user          *root.User
 
-	crypto root.Crypto
+	crypto root.Cryptor
 
 	goodsImageService GoodsImageService
 	userService       UserService
@@ -76,6 +76,6 @@ func (s *Session) SetAuthenticator(auth root.Authenticator) {
 }
 
 // SetCrypto 设置加密服务
-func (s *Session) SetCrypto(crypto root.Crypto) {
+func (s *Session) SetCrypto(crypto root.Cryptor) {
 	s.crypto = crypto
 }

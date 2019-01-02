@@ -24,10 +24,12 @@
 
 ## 第三方包依赖
 
-    - [sqlx](https://github.com/jmoiron/sqlx)
-    - [sqlmock](https://github.com/DATA-DOG/go-sqlmock)
-    - [logrus](https://github.com/sirupsen/logrus)
-    - [go-jwt](https://github.com/dgrijalva/jwt-go)
-    - [httprouter](https://github.com/julienschmidt/httprouter)
-    - [go-mssqldb](https://github.com/denisenkom/go-mssqldb)
-    - [go-mysql](https://github.com/go-sql-driver/mysql)
+    - [sqlx](go get github.com/jmoiron/sqlx)
+    - [sqlmock](go get github.com/DATA-DOG/go-sqlmock)
+    - [logrus](go get github.com/sirupsen/logrus)
+    - [go-jwt](go get github.com/dgrijalva/jwt-go)
+    - [httprouter](go get github.com/julienschmidt/httprouter)
+    - [go-mssqldb](go get github.com/denisenkom/go-mssqldb)
+    - [go-mysql](go get github.com/go-sql-driver/mysql)
+    - [gomigrate](go get github.com/DavidHuie/gomigrate)
+    - [uuid](go get github.com/nu7hatch/gouuid)

@@ -73,16 +73,42 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request, p http
 
 }
 
+// HandleCreateUser 创建用户
+func (h UserHandler) HandleCreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	user, err := decodeUser(r)
+	if err != nil {
+		Error(w, err, http.StatusBadRequest, h.log)
+		return
+	}
+
+	err = h.UserService.CreateUser(&user)
+	if err != nil {
+		Error(w, err, http.StatusInternalServerError, h.log)
+		return
+	}
+
+	encodeJSON(w, user, h.log)
+
+}
+
 func decodeCredentials(r *http.Request) (root.Credentials, error) {
 
 	var credentials root.Credentials
 
 	err := json.NewDecoder(r.Body).Decode(&credentials)
-	if err != nil {
-		return credentials, err
-	}
 
-	return credentials, nil
+	return credentials, err
+
+}
+
+func decodeUser(r *http.Request) (root.User, error) {
+
+	var user root.User
+
+	err := json.NewDecoder(r.Body).Decode(&user)
+
+	return user, err
 
 }
 

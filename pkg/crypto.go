@@ -1,7 +1,9 @@
 package root
 
-// Crypto 加密接口
-type Crypto interface {
-	Salt(s string) (string, error)               // 加密
-	Compare(hash string, s string) (bool, error) // 比较
+// Cryptor 加密接口
+type Cryptor interface {
+	// Salt 加盐
+	Salt(s string) (string, error)
+	// Compare 是否相等
+	Compare(hash string, s string) (bool, error)
 }

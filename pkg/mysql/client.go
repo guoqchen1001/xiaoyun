@@ -14,7 +14,7 @@ type Client struct {
 	Now           func() time.Time
 	Configer      root.Configer
 	Authenticator root.Authenticator
-	Crypto        root.Crypto
+	Crypto        root.Cryptor
 }
 
 // NewClient 生成数据路客户端

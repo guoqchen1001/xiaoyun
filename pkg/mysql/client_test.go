@@ -118,3 +118,25 @@ func TestClient_Connect(t *testing.T) {
 	client.Client.Connect()
 
 }
+
+func TestClient_Migrate(t *testing.T) {
+
+	client := NewClient()
+
+	log := root.NewLogStdOut()
+	err := client.Client.Migrate(log)
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = client.Client.Open()
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = client.Client.Migrate(log)
+	if err != nil {
+		t.Error(err)
+	}
+
+}

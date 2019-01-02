@@ -226,7 +226,7 @@ func TestUser_LoginOK(t *testing.T) {
 
 	columns := []string{"no", "name", "password"}
 	rows := sqlmock.NewRows(columns).
-		AddRow("0001", "测试", "1000")
+		AddRow("0001", "测试", "10001000")
 
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(credentials.UserName).WillReturnRows(rows)
 

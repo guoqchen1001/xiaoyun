@@ -172,3 +172,38 @@ func TestUser_LoginUserOrPwdInvalid(t *testing.T) {
 	}
 
 }
+
+func TestUser_CreateOK(t *testing.T) {
+
+	user := root.User{
+		No:       "0001",
+		Name:     "测试",
+		Password: "0122",
+	}
+
+	service := mock.UserService{}
+	service.CreateUserFn = func(user *root.User) error {
+		return nil
+	}
+
+	var reqByte []byte
+	reqByte, err := json.Marshal(user)
+	if err != nil {
+		t.Error(err)
+	}
+
+	reqBody := bytes.NewBuffer(reqByte)
+
+	req := httptest.NewRequest("POST", "/api/user", reqBody)
+	rr := httptest.NewRecorder()
+
+	handler := http.NewUserHandler()
+	handler.UserService = &service
+
+	handler.HandleCreateUser(rr, req, nil)
+
+	if rr.Code != 200 {
+		t.Errorf("http状态码不符合预期，预期[%d], 实际[%d]", 200, rr.Code)
+	}
+
+}
