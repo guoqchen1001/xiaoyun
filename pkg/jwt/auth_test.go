@@ -87,7 +87,7 @@ func TestJwt_Authenticate_Expired(t *testing.T) {
 	time.Sleep(time.Duration(a.ExpiresAt*2) * time.Second)
 
 	user, err = a.Authenticate(tokenString)
-	if err != nil {
+	if err == nil {
 		t.Error(err)
 		return
 	}

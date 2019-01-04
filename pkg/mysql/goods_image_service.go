@@ -25,7 +25,7 @@ func (s *GoodsImageService) GetGoodsImage(id int) (*root.GoodsImage, error) {
 										WHERE goods_id = ?`, id)
 
 	if err != nil {
-		customErr.Code = root.EDBQUERYERROR
+		customErr.Code = "db_query_error"
 		customErr.Err = err
 		return nil, &customErr
 	}
@@ -50,7 +50,7 @@ func (s *GoodsImageService) CreateGoodsImage(goodsImage *root.GoodsImage) error 
 	user, err := s.session.authenticator.Authenticate(token)
 	if err != nil {
 		customErr.Err = err
-		customErr.Code = root.EAUTHERROR
+		customErr.Code = "auth_error"
 		return &customErr
 	}
 
@@ -70,14 +70,14 @@ func (s *GoodsImageService) CreateGoodsImage(goodsImage *root.GoodsImage) error 
 
 	tx, err := s.session.db.Beginx()
 	if err != nil {
-		customErr.Code = root.EDBBEGINERROR
+		customErr.Code = "db_begin_error"
 		return &customErr
 	}
 
 	stmt, err := tx.PrepareNamed(`INSERT INTO goods_images(goods_id, id, size, create_at, create_by))
 							  VALUES(:goods_id, :id, :size, :create_at, :create_by )`)
 	if err != nil {
-		customErr.Code = root.EDBPREPAREERROR
+		customErr.Code = "db_prepare_error"
 		customErr.Err = err
 		return &customErr
 	}
@@ -88,7 +88,7 @@ func (s *GoodsImageService) CreateGoodsImage(goodsImage *root.GoodsImage) error 
 		_, err := stmt.Exec(m)
 		if err != nil {
 			tx.Rollback()
-			customErr.Code = root.EDBEXECERROR
+			customErr.Code = "db_exec_error"
 			customErr.Err = err
 			return &customErr
 		}

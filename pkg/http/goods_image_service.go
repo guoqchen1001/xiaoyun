@@ -13,16 +13,16 @@ import (
 	uuid "github.com/nu7hatch/gouuid"
 )
 
-// GoodsImageHandler 商品图片处理器
-type GoodsImageHandler struct {
+// ImageHandler 商品图片处理器
+type ImageHandler struct {
 	*httprouter.Router
 	GoodsImageService root.GoodsImageService
 	log               *root.Log
 }
 
-// NewGoodsImageHandler 生成商品图片处理器
-func NewGoodsImageHandler(service root.GoodsImageService, log *root.Log) *GoodsImageHandler {
-	h := GoodsImageHandler{
+// NewImageHandler 生成商品图片处理器
+func NewImageHandler(service root.GoodsImageService, log *root.Log) *ImageHandler {
+	h := ImageHandler{
 		Router:            httprouter.New(),
 		GoodsImageService: service,
 		log:               log,
@@ -35,7 +35,7 @@ func NewGoodsImageHandler(service root.GoodsImageService, log *root.Log) *GoodsI
 }
 
 // handleGoodsImage 获取商品图片
-func (h *GoodsImageHandler) handleGoodsImage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (h *ImageHandler) handleGoodsImage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	const op = "http.GoodsImageHandler.GoodsImage"
 
@@ -62,7 +62,7 @@ func (h *GoodsImageHandler) handleGoodsImage(w http.ResponseWriter, r *http.Requ
 }
 
 // handleUploadGoodsImage 上传商品图片
-func (h *GoodsImageHandler) handleUploadGoodsImage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (h *ImageHandler) handleUploadGoodsImage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	// 解析token
 	r.ParseForm()

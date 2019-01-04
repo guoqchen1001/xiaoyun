@@ -51,8 +51,8 @@ func TestClient_GetConfigError(t *testing.T) {
 
 	client := mssql.NewClient(&config)
 
-	if err := client.Open(); root.ErrorCode(err) != root.ECONFIGNOTINVALID {
-		t.Errorf("配置文件错误判断出错,期待%s, 实际%s", root.ECONFIGNOTINVALID, root.ErrorCode(err))
+	if err := client.Open(); root.ErrorCode(err) != "config_invalid" {
+		t.Errorf("配置文件错误判断出错,期待%s, 实际%s", "config_invalid", root.ErrorCode(err))
 	}
 	defer client.Close()
 
@@ -67,8 +67,8 @@ func TestClient_MssqlConfigNil(t *testing.T) {
 
 	client := mssql.NewClient(&config)
 
-	if err := client.Open(); root.ErrorCode(err) != root.ECONFIGMSSQLNOTFOUND {
-		t.Errorf("错误返回值不符合预期，预期[%s]，实际[%s]", root.ECONFIGMSSQLNOTFOUND, root.ErrorCode(err))
+	if err := client.Open(); root.ErrorCode(err) != "config_mssql_not_found" {
+		t.Errorf("错误返回值不符合预期，预期[%s]，实际[%s]", "config_mssql_not_found", root.ErrorCode(err))
 	}
 
 	defer client.Close()
@@ -87,8 +87,8 @@ func TestConfig_OpenError(t *testing.T) {
 
 	client := mssql.NewClient(&config)
 
-	if err := client.Open(); root.ErrorCode(err) != root.EDBOPENERROR {
-		t.Errorf("错误返回值不符合预期，预期[%s], 实际[%s]", root.EDBOPENERROR, root.ErrorCode(err))
+	if err := client.Open(); root.ErrorCode(err) != "db_open_error" {
+		t.Errorf("错误返回值不符合预期，预期[%s], 实际[%s]", "db_open_error", root.ErrorCode(err))
 	}
 
 	defer client.Close()

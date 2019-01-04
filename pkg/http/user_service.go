@@ -25,6 +25,7 @@ func NewUserHandler(service root.UserService, log *root.Log) *UserHandler {
 	}
 
 	h.POST("/api/user/login", h.HandleLogin)
+	h.POST("/api/user", h.HandleCreateUser)
 	return &h
 }
 
@@ -49,7 +50,7 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request, p http
 	}
 
 	if h.UserService == nil {
-		customErr.Code = root.ENILSERVICE
+		customErr.Code = "nil_service"
 		Error(w, &customErr, http.StatusInternalServerError, h.log)
 		return
 	}
@@ -77,6 +78,8 @@ func (h *UserHandler) HandleLogin(w http.ResponseWriter, r *http.Request, p http
 // HandleCreateUser 创建用户
 func (h UserHandler) HandleCreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
+	customError := root.Error{}
+
 	user, err := decodeUser(r)
 	if err != nil {
 		Error(w, err, http.StatusBadRequest, h.log)
@@ -85,10 +88,25 @@ func (h UserHandler) HandleCreateUser(w http.ResponseWriter, r *http.Request, p 
 
 	err = h.UserService.CreateUser(&user)
 	if err != nil {
-		Error(w, err, http.StatusInternalServerError, h.log)
+
+		customError.Err = err
+
+		if root.ErrorCode(err) == root.ECONFLICT {
+			customError.Message = "用户已存在"
+			Error(w, &customError, http.StatusConflict, h.log)
+			return
+
+		} else if root.ErrorCode(err) == root.EINVALID {
+			customError.Message = err.Error()
+			Error(w, &customError, http.StatusBadRequest, h.log)
+			return
+		}
+
+		Error(w, &customError, http.StatusInternalServerError, h.log)
 		return
 	}
 
+	user.Password = "******"
 	encodeJSON(w, user, h.log)
 
 }

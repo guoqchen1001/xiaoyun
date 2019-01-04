@@ -31,7 +31,7 @@ func TestGetGoodsImage(t *testing.T) {
 		AddRow(1, "asdfghhj", 102400, now, "admin")
 	goodsID := 1
 
-	mockSession.mock.ExpectQuery("SELECT (.+) FROM goods_image WHERE").WithArgs(goodsID).WillReturnRows(rows)
+	mockSession.mock.ExpectQuery("SELECT (.+) FROM goods_images WHERE").WithArgs(goodsID).WillReturnRows(rows)
 
 	service := mockSession.mysqlSession.GoodsImageService()
 	result, err := service.GetGoodsImage(goodsID)
@@ -76,7 +76,7 @@ func TestGoodsImage_NotFound(t *testing.T) {
 	rows := sqlmock.NewRows(columns)
 
 	goodsID := 1
-	mockSession.mock.ExpectQuery("SELECT (.+) FROM goods_image WHERE").WithArgs(goodsID).WillReturnRows(rows)
+	mockSession.mock.ExpectQuery("SELECT (.+) FROM goods_images WHERE").WithArgs(goodsID).WillReturnRows(rows)
 
 	_, err = service.GetGoodsImage(goodsID)
 
@@ -101,11 +101,11 @@ func TestGoodsImage_QueryError(t *testing.T) {
 
 	err = errors.New("selecterr")
 	goodsID := 1
-	mockSession.mock.ExpectQuery("SELECT (.+) FROM `goods_image` WHERE").WithArgs(goodsID).WillReturnError(err)
+	mockSession.mock.ExpectQuery("SELECT (.+) FROM `goods_images` WHERE").WithArgs(goodsID).WillReturnError(err)
 
 	_, err = service.GetGoodsImage(goodsID)
-	if root.ErrorCode(err) != root.EDBQUERYERROR {
-		t.Errorf("错误返回值不符合预期，预期[%s]，实际[%s]", root.EDBQUERYERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "db_query_error" {
+		t.Errorf("错误返回值不符合预期，预期[%s]，实际[%s]", "db_prepare_error", root.ErrorCode(err))
 	}
 
 }
@@ -126,7 +126,7 @@ func TestCreateGoodsImage(t *testing.T) {
 	mock := mockSession.mock
 
 	mock.ExpectBegin()
-	stmt := mock.ExpectPrepare("INSERT INTO goods_image")
+	stmt := mock.ExpectPrepare("INSERT INTO goods_images")
 	stmt.ExpectExec().WillReturnResult(result)
 	stmt.ExpectExec().WillReturnResult(result)
 
@@ -158,7 +158,7 @@ func TestCreateGoodsImage_ExecError(t *testing.T) {
 	result := sqlmock.NewResult(0, 1)
 
 	mockSession.mock.ExpectBegin()
-	stmt := mockSession.mock.ExpectPrepare("INSERT INTO goods_image")
+	stmt := mockSession.mock.ExpectPrepare("INSERT INTO goods_images")
 	stmt.ExpectExec().WillReturnResult(result)
 	stmt.ExpectExec().WillReturnError(err)
 	mockSession.mock.ExpectRollback()
@@ -166,7 +166,7 @@ func TestCreateGoodsImage_ExecError(t *testing.T) {
 	goodsImage := getGoodsImage(3)
 
 	err = service.CreateGoodsImage(goodsImage)
-	if root.ErrorCode(err) != root.EDBEXECERROR {
+	if root.ErrorCode(err) != "db_exec_error" {
 		t.Error(err)
 	}
 
@@ -191,7 +191,7 @@ func TestCreateGoodsImage_BeginError(t *testing.T) {
 	goodsImage := getGoodsImage(3)
 
 	err = service.CreateGoodsImage(goodsImage)
-	if root.ErrorCode(err) != root.EDBBEGINERROR {
+	if root.ErrorCode(err) != "db_begin_error" {
 		t.Error(err)
 	}
 
@@ -241,8 +241,8 @@ func TestCreateGoodsImage_AuthError(t *testing.T) {
 	service := mockSession.mysqlSession.GoodsImageService()
 
 	err = service.CreateGoodsImage(goodsImage)
-	if root.ErrorCode(err) != root.EAUTHERROR {
-		t.Errorf("错误值不符合预期，预期[%s]，实际[%s]", root.EAUTHERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "auth_error" {
+		t.Errorf("错误值不符合预期，预期[%s]，实际[%s]", "auth_error", root.ErrorCode(err))
 	}
 
 }
@@ -262,12 +262,12 @@ func TestCreateGoodsImage_PrepareError(t *testing.T) {
 	err = errors.New("prepare_error")
 
 	mockSession.mock.ExpectBegin()
-	mockSession.mock.ExpectPrepare("INSERT INTO goods_image").WillReturnError(err)
+	mockSession.mock.ExpectPrepare("INSERT INTO goods_images").WillReturnError(err)
 
 	goodsImage := getGoodsImage(3)
 
 	err = service.CreateGoodsImage(goodsImage)
-	if root.ErrorCode(err) != root.EDBPREPAREERROR {
+	if root.ErrorCode(err) != "db_prepare_error" {
 		t.Error(err)
 	}
 

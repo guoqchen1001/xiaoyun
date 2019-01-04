@@ -15,7 +15,7 @@ func TestFileNotFound(t *testing.T) {
 	c := config.NewConfig(path)
 
 	_, err := c.GetConfig()
-	if root.ErrorCode(err) != root.ECONFIGNOTFOUND {
+	if root.ErrorCode(err) != "config_not_found" {
 		t.Error(err)
 	}
 }
@@ -38,7 +38,7 @@ func TestConfNotInValid(t *testing.T) {
 	c := config.NewConfig(path)
 
 	_, err = c.GetConfig()
-	if root.ErrorCode(err) != root.ECONFIGNOTINVALID {
+	if root.ErrorCode(err) != "config_not_invalid" {
 		t.Error(err)
 	}
 

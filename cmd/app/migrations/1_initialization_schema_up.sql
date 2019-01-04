@@ -2,7 +2,8 @@ create table  if not exists users (
     id int unsigned not null primary key auto_increment,
     no varchar(15) not null default '',
     name nvarchar(255) not null default '',
-    group_id varchar(15) not null default '',
+    password varchar(255) not null default '',
+    group_no varchar(15) not null default '',
     create_at timestamp not null default now(),
     create_by varchar(15) not null default '',
     constraint uc_users_no unique(no)

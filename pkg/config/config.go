@@ -61,7 +61,7 @@ func getContentFromFile(path string) (*os.File, error) {
 		customError = root.Error{
 			Op:   op,
 			Err:  err,
-			Code: root.ECONFIGNOTFOUND,
+			Code: "config_not_found",
 		}
 		return file, &customError
 	}
@@ -78,7 +78,7 @@ func (c *Config) parseFromJSONFile(file io.Reader) error {
 		customError := root.Error{
 			Op:   op,
 			Err:  err,
-			Code: root.ECONFIGNOTINVALID,
+			Code: "config_not_invalid",
 		}
 		return &customError
 	}

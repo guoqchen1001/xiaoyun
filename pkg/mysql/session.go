@@ -49,7 +49,7 @@ func (s *Session) Authenticate(token string) (*root.User, error) {
 
 	user, err := s.authenticator.Authenticate(token)
 	if err != nil {
-		customErr.Code = root.EAUTHERROR
+		customErr.Code = "auth_error"
 		customErr.Err = err
 		return nil, &customErr
 	}

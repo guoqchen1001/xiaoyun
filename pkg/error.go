@@ -20,47 +20,10 @@ type Error struct {
 
 // 通用错误码
 const (
-	ECONFLICT = "conflict"  // 冲突
-	EINTERNAL = "internal"  // 内部错误
-	EINVALID  = "invalid"   // 未通过验证
-	ENOFOUND  = "not_found" // 未找到
-)
-
-// 配置信息错误
-const (
-	ECONFIGNOTFOUND      = "config_not_found"       // 配置文件不存在
-	ECONFIGNOTINVALID    = "config_not_invalid"     // 配置文件格式不合法
-	ECONFIGMYSQLNOTFOUND = "config_mysql_not_found" // mysql配置信息不存在
-	ECONFIGMSSQLNOTFOUND = "config_mssql_not_found" // mssql配置信息不存在
-	ECONFIGHTTPNOTFOUND  = "config_http_not_found"  // http配置不存在
-	ECONFIGAUTHNOTFOUND  = "config_auth_not_found"  // auth配置不存在
-)
-
-// 服务验证错误
-const (
-	ESERVICEWITHNILSESSION = "service_with_nil_session" // session对象为空
-	ESERVICEWITHNILDB      = "service_with_nil_db"      // 数据库对象为空
-	ESERVICEWITHNILCRYPTO  = "service_with_nil_crypto"  // 空的加密对象
-)
-
-// 数据库错误
-const (
-	EDBQUERYERROR   = "db_query_error"   // 数据库查询错误
-	EDBBEGINERROR   = "db_begin_error"   // 数据库开始事务错误
-	EDBPREPAREERROR = "db_prepare_error" // 数据库准备stmt失败
-	EDBEXECERROR    = "db_exec_error"    // 数据库语执行错误
-	EDBOPENERROR    = "db_open_error"    // 数据库打开失败
-)
-
-//EAUTHERROR token解析错误
-const EAUTHERROR = "auth_error" // 身份验证错误
-// ECRYPTOERROR 解加密错误
-const ECRYPTOERROR = "crypto_error" // 加密解密错误
-
-// http错误
-const (
-	ENILREQUESTBODY = "nil_request_body" // 空请求体
-	ENILSERVICE     = "nil_service"      // 空服务
+	ECONFLICT = "conflict"  // 冲突,用于当前记录与现有记录冲突
+	EINTERNAL = "internal"  // 内部错误, 用于不易于对外展示的错误
+	EINVALID  = "invalid"   // 未通过验证， 用于验证失败
+	ENOFOUND  = "not_found" // 未找到， 用于未发现记录
 )
 
 // Error 实现错误接口

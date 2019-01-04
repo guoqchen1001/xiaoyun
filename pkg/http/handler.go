@@ -9,10 +9,10 @@ import (
 
 // Handler 处理器
 type Handler struct {
-	Log               *root.Log
-	GoodsHandler      *GoodsHandler
-	GoodsImageHandler *GoodsImageHandler
-	UserHandler       *UserHandler
+	Log          *root.Log
+	GoodsHandler *GoodsHandler
+	ImageHandler *ImageHandler
+	UserHandler  *UserHandler
 }
 
 // Services 服务集
@@ -34,7 +34,7 @@ func (h *Handler) Init(s Services) {
 	// 商品服务
 	h.GoodsHandler = NewGoodsHandler(s.GoodsService, h.Log)
 	// 商品图片服务
-	h.GoodsImageHandler = NewGoodsImageHandler(s.GoodsImageService, h.Log)
+	h.ImageHandler = NewImageHandler(s.GoodsImageService, h.Log)
 	// 用户服务
 	h.UserHandler = NewUserHandler(s.UserService, h.Log)
 
@@ -44,12 +44,19 @@ func (h *Handler) Init(s Services) {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasPrefix(r.URL.Path, "/api/goods") {
+
 		h.GoodsHandler.ServeHTTP(w, r)
+
 	} else if strings.HasPrefix(r.URL.Path, "/api/image") {
-		h.GoodsImageHandler.ServeHTTP(w, r)
+
+		h.ImageHandler.ServeHTTP(w, r)
+
 	} else if strings.HasPrefix(r.URL.Path, "/api/user") {
+
 		h.UserHandler.ServeHTTP(w, r)
+
 	} else {
+
 		http.NotFound(w, r)
 	}
 }

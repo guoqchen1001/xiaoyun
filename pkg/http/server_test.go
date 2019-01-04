@@ -1,24 +1,69 @@
 package http_test
 
 import (
+	"errors"
 	"testing"
 	root "xiaoyun/pkg"
 	"xiaoyun/pkg/http"
-	"xiaoyun/pkg/mock"
 )
 
-type Config struct{}
+type Config struct {
+	Host  string
+	Error bool
+}
 
 func (c *Config) GetConfig() (*root.Config, error) {
-	return &root.Config{
-		HTTP: &root.HTTPConfig{
-			Host: ":2222",
-		},
-	}, nil
+	if c.Error == false {
+		return &root.Config{
+			HTTP: &root.HTTPConfig{
+				Host: c.Host,
+			},
+		}, nil
+	} else {
+		return nil, errors.New("server_config_error")
+	}
+
 }
 func TestServer(t *testing.T) {
-	handler := getMockGoodsHandler(&mock.GoodsService{})
-	c := Config{}
-	http.NewServer(&c, handler)
 
+	c := Config{
+		Host: ":2222",
+	}
+	handler := http.NewHandler(root.NewLogStdOut())
+
+	server := http.NewServer(&c, handler)
+
+	go server.Open()
+	go server.Open()
+
+	defer server.Close()
+
+}
+
+func TestServer_NilHost(t *testing.T) {
+
+	c := Config{}
+
+	handler := http.NewHandler(root.NewLogStdOut())
+
+	server := http.NewServer(&c, handler)
+
+	err := server.Open()
+	if root.ErrorCode(err) != "config_http_not_found" {
+		t.Error(err)
+	}
+
+}
+
+func TestServer_OpenConfigError(t *testing.T) {
+
+	c := Config{Error: true}
+	handler := http.NewHandler(root.NewLogStdOut())
+
+	server := http.NewServer(&c, handler)
+
+	err := server.Open()
+	if root.ErrorCode(err) != "http_server_open_getconfig_err" {
+		t.Error(err)
+	}
 }

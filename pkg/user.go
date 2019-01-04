@@ -2,10 +2,10 @@ package root
 
 // User 用户结构体
 type User struct {
-	No       string
-	Name     string
-	Password string
-	Group    UserGroup
+	No       string `json:"no"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	GroupNo  string `json:"group_no"`
 }
 
 // Credentials 登录证书

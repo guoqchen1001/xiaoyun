@@ -143,8 +143,8 @@ func TestSession_AuthenticateError(t *testing.T) {
 	mockSession.mysqlSession.SetAuthenticator(&authenticator)
 
 	_, err = mockSession.mysqlSession.Authenticate("123")
-	if root.ErrorCode(err) != root.EAUTHERROR {
-		t.Errorf("错误码不符合预期，预期[%s]，实际[%s]", root.EAUTHERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "auth_error" {
+		t.Errorf("错误码不符合预期，预期[%s]，实际[%s]", "auth_error", root.ErrorCode(err))
 	}
 
 }

@@ -17,19 +17,19 @@ func (c *GoodsService) Goods(no string) (*root.Goods, error) {
 	customErr.Op = "mssql.GoodsService.Goods"
 
 	if c.session == nil {
-		customErr.Code = root.ESERVICEWITHNILSESSION
+		customErr.Code = "service_with_nil_session"
 		return nil, &customErr
 	}
 
 	if c.session.db == nil {
-		customErr.Code = root.ESERVICEWITHNILDB
+		customErr.Code = "service_with_nil_db"
 		return nil, &customErr
 	}
 
 	tx, err := c.session.db.Beginx()
 
 	if err != nil {
-		customErr.Code = root.EDBBEGINERROR
+		customErr.Code = "db_begin_error"
 		customErr.Err = err
 		return nil, &customErr
 	}
@@ -45,7 +45,7 @@ func (c *GoodsService) Goods(no string) (*root.Goods, error) {
 			return nil, &customErr
 		}
 
-		customErr.Code = root.EDBQUERYERROR
+		customErr.Code = "db_query_error"
 		customErr.Err = err
 		return nil, &customErr
 	}

@@ -13,14 +13,18 @@ type Server struct {
 	Handler *Handler
 
 	configer root.Configer
+
+	server *http.Server
 }
 
 // NewServer 创建web服务器
 func NewServer(config root.Configer, handler *Handler) *Server {
-	return &Server{
+	s := &Server{
 		configer: config,
 		Handler:  handler,
+		server:   &http.Server{},
 	}
+	return s
 }
 
 // Open 打开web服务
@@ -32,41 +36,29 @@ func (s *Server) Open() error {
 
 	config, err := s.configer.GetConfig()
 	if err != nil {
+		customError.Code = "http_server_open_getconfig_err"
 		customError.Err = err
 		return &customError
 	}
 
-	if config.HTTP == nil {
-		customError.Code = root.ECONFIGHTTPNOTFOUND
+	if config.HTTP.Host == "" {
+		customError.Code = "config_http_not_found"
 		return &customError
 	}
 
-	ln, err := net.Listen("tcp", config.HTTP.Host)
+	s.server.Addr = config.HTTP.Host
+	s.server.Handler = s.Handler
 
-	if err != nil {
-		customError := root.Error{
-			Op:  op,
-			Err: err,
-		}
-		return &customError
-	}
-
-	s.ln = ln
-
-	http.Serve(s.ln, s.Handler)
+	s.server.ListenAndServe()
 
 	return nil
 }
 
 // Close 关闭web服务
 func (s *Server) Close() error {
-	if s.ln != nil {
-		s.ln.Close()
+
+	if s.server != nil {
+		s.server.Close()
 	}
 	return nil
-}
-
-// Port 返回服务器端口，仅在服务器端口打开时有效
-func (s *Server) Port() int {
-	return s.ln.Addr().(*net.TCPAddr).Port
 }

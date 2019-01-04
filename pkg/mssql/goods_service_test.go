@@ -101,8 +101,8 @@ func TestGoods_QueryError(t *testing.T) {
 	service := mockSession.mssqlSession.GoodsService()
 	_, err = service.Goods(no)
 
-	if root.ErrorCode(err) != root.EDBQUERYERROR {
-		t.Errorf(`错误类型不正确，期待包含[%s]，实际[%s]`, root.EDBQUERYERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "db_query_error" {
+		t.Errorf(`错误类型不正确，期待包含[%s]，实际[%s]`, "db_query_error", root.ErrorCode(err))
 	}
 
 	defer mockSession.mockDB.Close()
@@ -123,8 +123,8 @@ func TestGoods_TransError(t *testing.T) {
 	service := mockSession.mssqlSession.GoodsService()
 	_, err = service.Goods("")
 
-	if root.ErrorCode(err) != root.EDBBEGINERROR {
-		t.Errorf("错误返回值不正确，期待%s, 实际%s", root.EDBBEGINERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "db_begin_error" {
+		t.Errorf("错误返回值不正确，期待%s, 实际%s", "db_begin_error", root.ErrorCode(err))
 	}
 
 	defer mockSession.mockDB.Close()
@@ -138,8 +138,8 @@ func TestGoods_NilSession(t *testing.T) {
 	service := mssql.GoodsService{}
 
 	_, err := service.Goods(no)
-	if root.ErrorCode(err) != root.ESERVICEWITHNILSESSION {
-		t.Errorf("错误返回值不正确，期待%s, 实际%s", root.ESERVICEWITHNILSESSION, root.ErrorCode(err))
+	if root.ErrorCode(err) != "service_with_nil_session" {
+		t.Errorf("错误返回值不正确，期待%s, 实际%s", "service_with_nil_session", root.ErrorCode(err))
 	}
 
 }
@@ -153,8 +153,8 @@ func TestGoods_NilDB(t *testing.T) {
 
 	_, err := service.Goods("01")
 
-	if root.ErrorCode(err) != root.ESERVICEWITHNILDB {
-		t.Errorf("错误返回值不正确，期待%s, 实际%s", root.ESERVICEWITHNILDB, root.ErrorCode(err))
+	if root.ErrorCode(err) != "service_with_nil_db" {
+		t.Errorf("错误返回值不正确，期待%s, 实际%s", "service_with_nil_db", root.ErrorCode(err))
 	}
 
 }

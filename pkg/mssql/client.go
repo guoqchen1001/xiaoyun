@@ -52,13 +52,13 @@ func (c *Client) Open() error {
 
 	config, err := c.Configer.GetConfig()
 	if err != nil {
-		customError.Code = root.ECONFIGNOTINVALID
+		customError.Code = "config_invalid"
 		customError.Err = err
 		return &customError
 	}
 
 	if config.Mssql == nil {
-		customError.Code = root.ECONFIGMSSQLNOTFOUND
+		customError.Code = "config_mssql_not_found"
 		return &customError
 	}
 
@@ -69,7 +69,7 @@ func (c *Client) Open() error {
 
 	db, err := sqlx.Open(dialects, config.Mssql.Parm)
 	if err != nil {
-		customError.Code = root.EDBOPENERROR
+		customError.Code = "db_open_error"
 		customError.Err = err
 		return &customError
 	}

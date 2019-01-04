@@ -63,7 +63,7 @@ func TestClient_OpenNilMysql(t *testing.T) {
 	Client := mysql.NewClient(&configer)
 
 	err := Client.Open()
-	if root.ErrorCode(err) != root.ECONFIGMYSQLNOTFOUND {
+	if root.ErrorCode(err) != "config_mysql_not_found" {
 		t.Error(err)
 	}
 
@@ -81,7 +81,7 @@ func TestClient_OpenConfigError(t *testing.T) {
 	Client := mysql.NewClient(&configer)
 
 	err := Client.Open()
-	if root.ErrorCode(err) != root.ECONFIGNOTINVALID {
+	if root.ErrorCode(err) != "config_invalid" {
 		t.Error(err)
 	}
 
@@ -105,8 +105,8 @@ func TestClient_OpenError(t *testing.T) {
 
 	err := Client.Open()
 
-	if root.ErrorCode(err) != root.EDBOPENERROR {
-		t.Error(err)
+	if root.ErrorCode(err) != "db_open_error" {
+		t.Errorf("错误返回值不符合预期，预期[%s], 实际[%s],错误信息:%s", "db_open_error", root.ErrorCode(err), err.Error())
 	}
 
 	defer Client.Close()
@@ -116,27 +116,5 @@ func TestClient_OpenError(t *testing.T) {
 func TestClient_Connect(t *testing.T) {
 	client := NewClient()
 	client.Client.Connect()
-
-}
-
-func TestClient_Migrate(t *testing.T) {
-
-	client := NewClient()
-
-	log := root.NewLogStdOut()
-	err := client.Client.MigrateUp(log)
-	if err != nil {
-		t.Error(err)
-	}
-
-	err = client.Client.Open()
-	if err != nil {
-		t.Error(err)
-	}
-
-	err = client.Client.MigrateUp(log)
-	if err != nil {
-		t.Error(err)
-	}
 
 }

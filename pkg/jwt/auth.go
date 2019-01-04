@@ -80,7 +80,6 @@ func (a *Authenticator) Token(user *root.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return ss, nil
 
 }
@@ -91,8 +90,7 @@ func (a *Authenticator) init() error {
 	customError.Op = "jwt.Authenticator.Init"
 
 	if a.Configer == nil {
-		customError.Code = root.ECONFIGNOTFOUND
-		return &customError
+		return nil
 	}
 
 	config, err := a.Configer.GetConfig()
@@ -102,7 +100,7 @@ func (a *Authenticator) init() error {
 	}
 
 	if config.Auth == nil {
-		customError.Code = root.ECONFIGAUTHNOTFOUND
+		customError.Code = "config_auth_not_found"
 		return &customError
 	}
 

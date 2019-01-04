@@ -49,12 +49,12 @@ func (c *Client) Open() error {
 	config, err := c.Configer.GetConfig()
 	if err != nil {
 		customErr.Err = err
-		customErr.Code = root.ECONFIGNOTINVALID
+		customErr.Code = "config_invalid"
 		return &customErr
 	}
 
 	if config.Mysql == nil {
-		customErr.Code = root.ECONFIGMYSQLNOTFOUND
+		customErr.Code = "config_mysql_not_found"
 		return &customErr
 	}
 
@@ -65,7 +65,7 @@ func (c *Client) Open() error {
 
 	db, err := sqlx.Open(dialects, config.Mysql.Parm)
 	if err != nil {
-		customErr.Code = root.EDBOPENERROR
+		customErr.Code = "db_open_error"
 		customErr.Err = err
 		return &customErr
 	}

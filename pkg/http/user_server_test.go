@@ -196,6 +196,44 @@ func TestUser_CreateOK(t *testing.T) {
 
 }
 
+func TestUser_CreateDecodeError(t *testing.T) {
+
+	reqBody := bytes.NewBufferString("test")
+	req := httptest.NewRequest("POST", "/api/user", reqBody)
+	rr := httptest.NewRecorder()
+
+	handler := getMockUserHandler(&mock.UserService{})
+
+	handler.UserHandler.HandleCreateUser(rr, req, nil)
+
+	if rr.Code != 400 {
+		t.Errorf("http状态码不符合预期，预期[%d]，实际[%d]", 400, rr.Code)
+	}
+
+}
+
+func TestUser_CreateError(t *testing.T) {
+
+	service := mock.UserService{}
+	service.CreateUserFn = func(user *root.User) error {
+		return errors.New("test_user_create_error")
+	}
+
+	handler := getMockUserHandler(&service)
+
+	reqByte, _ := json.Marshal(root.User{})
+	reqBody := bytes.NewBuffer(reqByte)
+	req := httptest.NewRequest("POST", "/api/user", reqBody)
+	rr := httptest.NewRecorder()
+
+	handler.UserHandler.HandleCreateUser(rr, req, nil)
+
+	if rr.Code != 500 {
+		t.Errorf("http状态码不符合预期，预期[%d]，实际[%d]", 500, rr.Code)
+	}
+
+}
+
 func getMockUserHandler(service *mock.UserService) *http.Handler {
 
 	handler := http.NewHandler(root.NewLogStdOut())

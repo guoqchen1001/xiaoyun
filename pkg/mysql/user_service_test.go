@@ -22,6 +22,7 @@ func TestUser_CreateOK(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	session.mock.ExpectQuery(`^SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(sql.ErrNoRows)
 	session.mock.ExpectBegin()
@@ -52,6 +53,7 @@ func TestUser_CreateQueryError(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	err = errors.New("查询错误")
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(err)
@@ -60,8 +62,8 @@ func TestUser_CreateQueryError(t *testing.T) {
 
 	err = service.CreateUser(&user)
 
-	if root.ErrorCode(err) != root.EDBQUERYERROR {
-		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s]", root.EDBQUERYERROR, root.ErrorCode(err))
+	if root.ErrorCode(err) != "db_query_error" {
+		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s]", "db_query_error", root.ErrorCode(err))
 	}
 
 }
@@ -79,6 +81,7 @@ func TestUser_CreateConflict(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	columns := []string{
 		"no", "name", "password",
@@ -111,6 +114,7 @@ func TestUser_CreateBeginError(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(sql.ErrNoRows)
 
@@ -119,8 +123,8 @@ func TestUser_CreateBeginError(t *testing.T) {
 
 	service := session.mysqlSession.UserService()
 	err = service.CreateUser(&user)
-	if root.ErrorCode(err) != root.EDBBEGINERROR {
-		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", root.EDBBEGINERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "db_begin_error" {
+		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", "db_begin_error", root.ErrorCode(err), err.Error())
 	}
 
 }
@@ -138,6 +142,7 @@ func TestUser_CreatePrepareError(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(sql.ErrNoRows)
 
@@ -147,8 +152,8 @@ func TestUser_CreatePrepareError(t *testing.T) {
 
 	service := session.mysqlSession.UserService()
 	err = service.CreateUser(&user)
-	if root.ErrorCode(err) != root.EDBPREPAREERROR {
-		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", root.EDBPREPAREERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "db_prepare_error" {
+		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", "db_prepare_error", root.ErrorCode(err), err.Error())
 	}
 
 }
@@ -166,18 +171,25 @@ func TestUser_CreateExecError(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(sql.ErrNoRows)
+
 	err = errors.New("Exec Error")
+
 	session.mock.ExpectBegin()
+
 	stmt := session.mock.ExpectPrepare("INSERT INTO users")
+
 	stmt.ExpectExec().WillReturnError(err)
+
 	session.mock.ExpectRollback()
 
 	service := session.mysqlSession.UserService()
+
 	err = service.CreateUser(&user)
-	if root.ErrorCode(err) != root.EDBEXECERROR {
-		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", root.EDBEXECERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "db_exec_error" {
+		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", "db_exec_error", root.ErrorCode(err), err.Error())
 	}
 
 }
@@ -200,13 +212,14 @@ func TestUser_CreateSaltError(t *testing.T) {
 	user.No = "0001"
 	user.Name = "测试"
 	user.Password = "0001"
+	user.GroupNo = "01"
 
 	session.mock.ExpectQuery(`SELECT (.+) FROM users WHERE`).WithArgs(user.No).WillReturnError(sql.ErrNoRows)
 
 	service := session.mysqlSession.UserService()
 	err = service.CreateUser(&user)
-	if root.ErrorCode(err) != root.ECRYPTOERROR {
-		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", root.ECRYPTOERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "crypto_error" {
+		t.Errorf("错误值返回不符合预期, 预期[%s], 实际[%s], 错误信息: %s", "crypto_error", root.ErrorCode(err), err.Error())
 	}
 
 }
@@ -259,8 +272,8 @@ func TestUser_LoginQueryError(t *testing.T) {
 	service := session.mysqlSession.UserService()
 
 	_, err = service.Login(credentials)
-	if root.ErrorCode(err) != root.EDBQUERYERROR {
-		t.Errorf("错误返回值不符合预期，预期[%s],实际[%s],错误信息[%s]", root.EDBQUERYERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "db_query_error" {
+		t.Errorf("错误返回值不符合预期，预期[%s],实际[%s],错误信息[%s]", "db_query_error", root.ErrorCode(err), err.Error())
 	}
 
 }
@@ -323,8 +336,8 @@ func TestUser_LoginCryptoError(t *testing.T) {
 	service := session.mysqlSession.UserService()
 
 	_, err = service.Login(credentials)
-	if root.ErrorCode(err) != root.ECRYPTOERROR {
-		t.Errorf("错误返回值不符合预期，预期[%s], 实际[%s], 错误信息:[%s]", root.ECRYPTOERROR, root.ErrorCode(err), err.Error())
+	if root.ErrorCode(err) != "crypto_error" {
+		t.Errorf("错误返回值不符合预期，预期[%s], 实际[%s], 错误信息:[%s]", "crypto_error", root.ErrorCode(err), err.Error())
 	}
 
 }

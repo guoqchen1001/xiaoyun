@@ -26,13 +26,13 @@ func (s *UserService) Login(credentials root.Credentials) (string, error) {
 								 	 WHERE no = ? `, userName)
 	if err != nil {
 		customErr.Err = err
-		customErr.Code = root.EDBQUERYERROR
+		customErr.Code = "db_query_error"
 		return "", &customErr
 	}
 
 	ok, err := s.session.crypto.Compare(model.Password, model.No+passWord)
 	if err != nil {
-		customErr.Code = root.ECRYPTOERROR
+		customErr.Code = "crypto_error"
 		customErr.Err = err
 		return "", &customErr
 	}
@@ -60,14 +60,20 @@ func (s *UserService) Login(credentials root.Credentials) (string, error) {
 func (s *UserService) CreateUser(user *root.User) error {
 
 	var customError root.Error
-	customError.Op = "mysql.Session.CreateUser"
+	customError.Op = "mysql.UserService.CreateUser"
 
 	model := toUserModel(user)
+
+	if err := model.Validate(); err != nil {
+		customError.Err = err
+		customError.Code = root.EINVALID
+		return &customError
+	}
 
 	passwrod, err := s.session.crypto.Salt(model.Password)
 	if err != nil {
 		customError.Err = err
-		customError.Code = root.ECRYPTOERROR
+		customError.Code = "crypto_error"
 		return &customError
 	}
 	model.Password = passwrod
@@ -77,7 +83,7 @@ func (s *UserService) CreateUser(user *root.User) error {
 	if err != nil {
 		if err != sql.ErrNoRows {
 			customError.Err = err
-			customError.Code = root.EDBQUERYERROR
+			customError.Code = "db_query_error"
 			return &customError
 		}
 	} else {
@@ -86,19 +92,18 @@ func (s *UserService) CreateUser(user *root.User) error {
 	}
 
 	// 密码加盐处理
-
 	tx, err := s.session.db.Beginx()
 	if err != nil {
-		customError.Code = root.EDBBEGINERROR
+		customError.Code = "db_begin_error"
 		customError.Err = err
 		return &customError
 	}
 	defer tx.Rollback()
 
-	stmt, err := tx.PrepareNamed(`INSERT INTO users (no, name, password)
-								  VALUES(:no, :name, :password)`)
+	stmt, err := tx.PrepareNamed(`INSERT INTO users (no, name, password, group_no)
+								  VALUES(:no, :name, :password, :group_no)`)
 	if err != nil {
-		customError.Code = root.EDBPREPAREERROR
+		customError.Code = "db_prepare_error"
 		customError.Err = err
 		return &customError
 	}
@@ -106,7 +111,7 @@ func (s *UserService) CreateUser(user *root.User) error {
 	_, err = stmt.Exec(model)
 	if err != nil {
 		tx.Rollback()
-		customError.Code = root.EDBEXECERROR
+		customError.Code = "db_exec_error"
 		customError.Err = err
 		return &customError
 	}
