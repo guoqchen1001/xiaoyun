@@ -84,8 +84,8 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// Migrate 数据库迁移
-func (c *Client) Migrate(log *root.Log) error {
+// MigrateUp 数据库迁移升级
+func (c *Client) MigrateUp(log *root.Log) error {
 
 	if c.db == nil {
 		return nil
@@ -102,6 +102,31 @@ func (c *Client) Migrate(log *root.Log) error {
 	}
 
 	err = m.Up()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MigrateDown 数据库迁移降级
+func (c *Client) MigrateDown(log *root.Log) error {
+
+	if c.db == nil {
+		return nil
+	}
+
+	config, err := c.Configer.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	m, err := NewMigrate(c.db.DB, config.Mysql.Migrations, log.Logger)
+	if err != nil {
+		return err
+	}
+
+	err = m.Down()
 	if err != nil {
 		return err
 	}

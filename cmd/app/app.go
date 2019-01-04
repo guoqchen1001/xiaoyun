@@ -22,8 +22,6 @@ type App struct {
 	sever       *http.Server       // http服务
 	crypto      *crypto.Crypto     // 加密服务
 
-	sessionMssql *mssql.Session
-	sessionMysql *mysql.Session
 }
 
 // SetEnv 初始化系统运行环境
@@ -55,14 +53,14 @@ func (a *App) Run() error {
 		return err
 	}
 
-	err := a.clientMysql.Migrate(a.log)
+	err := a.clientMysql.MigrateUp(a.log)
 	if err != nil {
 		return err
 	}
 
 	defer a.clientMysql.Close()
 
-	a.initializeService()
+	a.initializeCustomHandler()
 
 	return a.sever.Open()
 }
@@ -107,13 +105,17 @@ func (a *App) initializeServer() {
 	a.sever = server
 }
 
-func (a *App) initializeService() {
+func (a *App) initializeCustomHandler() {
 
-	a.sessionMssql = a.clientMssql.Connect()
-	a.sessionMysql = a.clientMysql.Connect()
+	sessionMssql := a.clientMssql.Connect()
+	sessionMysql := a.clientMysql.Connect()
 
-	a.handler.GoodsHandler.GoodsService = a.sessionMssql.GoodsService()
-	a.handler.GoodsImageHandler.GoodsImageService = a.sessionMysql.GoodsImageService()
-	a.handler.UserHandler.UserService = a.sessionMysql.UserService()
+	services := http.Services{
+		GoodsService:      sessionMssql.GoodsService(),
+		GoodsImageService: sessionMysql.GoodsImageService(),
+		UserService:       sessionMysql.UserService(),
+	}
+
+	a.handler.Init(services)
 
 }

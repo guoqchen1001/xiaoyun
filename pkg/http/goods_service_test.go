@@ -26,9 +26,7 @@ func TestGetGoods_goods(t *testing.T) {
 		return &goods, nil
 	}
 
-	log := root.NewLogStdOut()
-	handler := http.NewHandler(log)
-	handler.GoodsHandler.GoodsService = &mockService
+	handler := getMockGoodsHandler(&mockService)
 
 	req := httptest.NewRequest("GET", "/api/goods/", nil)
 	rr := httptest.NewRecorder()
@@ -51,11 +49,8 @@ func TestGetGoods_NotFound(t *testing.T) {
 
 	mockService := testGetGoods_getMockService()
 
-	// 商品处理器
-	log := root.NewLogStdOut()
-	handler := http.NewHandler(log)
+	handler := getMockGoodsHandler(mockService)
 
-	handler.GoodsHandler.GoodsService = mockService
 	// 注入商品服务为测试数据
 
 	// 创建response
@@ -83,9 +78,7 @@ func TestGetGoods_InternalError(t *testing.T) {
 
 	mockService := testGetGoods_getMockService()
 
-	log := root.NewLogFileOut("app.log")
-	handler := http.NewHandler(log)
-	handler.GoodsHandler.GoodsService = mockService
+	handler := getMockGoodsHandler(mockService)
 
 	rr := httptest.NewRecorder()
 
@@ -122,4 +115,18 @@ func testGetGoods_getMockService() *mock.GoodsService {
 	}
 
 	return &mockService
+}
+
+func getMockGoodsHandler(service *mock.GoodsService) *http.Handler {
+
+	log := root.NewLogStdOut()
+	services := http.Services{
+		GoodsService: service,
+	}
+
+	handler := http.NewHandler(log)
+	handler.Init(services)
+
+	return handler
+
 }

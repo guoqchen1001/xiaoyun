@@ -11,16 +11,17 @@ import (
 // UserHandler 获取token
 type UserHandler struct {
 	*httprouter.Router
-	log           *root.Log
-	UserService   root.UserService
-	authenticator root.Authenticator
+	log         *root.Log
+	UserService root.UserService
 }
 
 // NewUserHandler 返回用户处理器
-func NewUserHandler() *UserHandler {
+func NewUserHandler(service root.UserService, log *root.Log) *UserHandler {
 
 	h := UserHandler{
-		Router: httprouter.New(),
+		Router:      httprouter.New(),
+		UserService: service,
+		log:         log,
 	}
 
 	h.POST("/api/user/login", h.HandleLogin)

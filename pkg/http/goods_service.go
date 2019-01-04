@@ -16,9 +16,11 @@ type GoodsHandler struct {
 }
 
 // NewGoodsHandler 创建新的商品处理器
-func NewGoodsHandler() *GoodsHandler {
+func NewGoodsHandler(service root.GoodsService, log *root.Log) *GoodsHandler {
 	h := &GoodsHandler{
-		Router: httprouter.New(),
+		Router:       httprouter.New(),
+		GoodsService: service,
+		log:          log,
 	}
 
 	h.GET("/api/goods/:no", h.HandleGetGoods)

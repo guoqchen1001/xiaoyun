@@ -124,7 +124,7 @@ func TestClient_Migrate(t *testing.T) {
 	client := NewClient()
 
 	log := root.NewLogStdOut()
-	err := client.Client.Migrate(log)
+	err := client.Client.MigrateUp(log)
 	if err != nil {
 		t.Error(err)
 	}
@@ -134,7 +134,7 @@ func TestClient_Migrate(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = client.Client.Migrate(log)
+	err = client.Client.MigrateUp(log)
 	if err != nil {
 		t.Error(err)
 	}

@@ -15,27 +15,29 @@ type Handler struct {
 	UserHandler       *UserHandler
 }
 
+// Services 服务集
+type Services struct {
+	GoodsService      root.GoodsService
+	GoodsImageService root.GoodsImageService
+	UserService       root.UserService
+}
+
 // NewHandler 创建新的处理器
 func NewHandler(log *root.Log) *Handler {
 	h := &Handler{Log: log}
-	h.initHandler()
 	return h
 }
 
-// initHandler 初始化处理器函数
-func (h *Handler) initHandler() {
+// Init 初始化处理器函数
+func (h *Handler) Init(s Services) {
 
 	// 商品服务
-	h.GoodsHandler = NewGoodsHandler()
-	h.GoodsHandler.log = h.Log
-
+	h.GoodsHandler = NewGoodsHandler(s.GoodsService, h.Log)
 	// 商品图片服务
-	h.GoodsImageHandler = NewGoodsImageHandler()
-	h.GoodsImageHandler.log = h.Log
-
+	h.GoodsImageHandler = NewGoodsImageHandler(s.GoodsImageService, h.Log)
 	// 用户服务
-	h.UserHandler = NewUserHandler()
-	h.UserHandler.log = h.Log
+	h.UserHandler = NewUserHandler(s.UserService, h.Log)
+
 }
 
 // ServeHTTP 开启http服务

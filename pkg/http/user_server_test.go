@@ -21,10 +21,7 @@ func TestUser_LoginOK(t *testing.T) {
 		return "mock_login", nil
 	}
 
-	log := root.NewLogStdOut()
-
-	handler := http.NewHandler(log)
-	handler.UserHandler.UserService = &mockService
+	handler := getMockUserHandler(&mockService)
 
 	credentials := root.Credentials{
 		UserName: "0122",
@@ -54,9 +51,7 @@ func TestUser_LoginOK(t *testing.T) {
 
 func TestUser_LoginBadRequest(t *testing.T) {
 
-	log := root.NewLogStdOut()
-
-	handler := http.NewHandler(log)
+	handler := getMockUserHandler(&mock.UserService{})
 
 	reqMap := map[string]string{
 		"user_name": "0122",
@@ -83,9 +78,7 @@ func TestUser_LoginBadRequest(t *testing.T) {
 
 func TestUser_LoginDecodeError(t *testing.T) {
 
-	log := root.NewLogStdOut()
-
-	handler := http.NewHandler(log)
+	handler := getMockUserHandler(&mock.UserService{})
 
 	var reqBytes []byte
 
@@ -105,9 +98,9 @@ func TestUser_LoginDecodeError(t *testing.T) {
 
 func TestUser_LoginNilService(t *testing.T) {
 
-	log := root.NewLogStdOut()
-
-	handler := http.NewHandler(log)
+	services := http.Services{}
+	handler := http.NewHandler(root.NewLogStdOut())
+	handler.Init(services)
 
 	credentials := root.Credentials{
 		UserName: "0122",
@@ -142,11 +135,7 @@ func TestUser_LoginUserOrPwdInvalid(t *testing.T) {
 		return "", errors.New("mock_login_eror")
 	}
 
-	log := root.NewLogStdOut()
-
-	handler := http.NewHandler(log)
-	handler.UserHandler.UserService = &mockService
-
+	handler := getMockUserHandler(&mockService)
 	credentials := root.Credentials{
 		UserName: "0122",
 		PassWord: "0122",
@@ -197,13 +186,25 @@ func TestUser_CreateOK(t *testing.T) {
 	req := httptest.NewRequest("POST", "/api/user", reqBody)
 	rr := httptest.NewRecorder()
 
-	handler := http.NewUserHandler()
-	handler.UserService = &service
+	handler := getMockUserHandler(&service)
 
-	handler.HandleCreateUser(rr, req, nil)
+	handler.UserHandler.HandleCreateUser(rr, req, nil)
 
 	if rr.Code != 200 {
 		t.Errorf("http状态码不符合预期，预期[%d], 实际[%d]", 200, rr.Code)
 	}
+
+}
+
+func getMockUserHandler(service *mock.UserService) *http.Handler {
+
+	handler := http.NewHandler(root.NewLogStdOut())
+
+	services := http.Services{
+		UserService: service,
+	}
+
+	handler.Init(services)
+	return handler
 
 }

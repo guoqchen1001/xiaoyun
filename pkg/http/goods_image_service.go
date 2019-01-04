@@ -21,9 +21,11 @@ type GoodsImageHandler struct {
 }
 
 // NewGoodsImageHandler 生成商品图片处理器
-func NewGoodsImageHandler() *GoodsImageHandler {
+func NewGoodsImageHandler(service root.GoodsImageService, log *root.Log) *GoodsImageHandler {
 	h := GoodsImageHandler{
-		Router: httprouter.New(),
+		Router:            httprouter.New(),
+		GoodsImageService: service,
+		log:               log,
 	}
 
 	h.GET("/api/image/goods/:id", h.handleGoodsImage)

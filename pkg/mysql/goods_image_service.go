@@ -21,7 +21,7 @@ func (s *GoodsImageService) GetGoodsImage(id int) (*root.GoodsImage, error) {
 											id, size, 
 											create_at,
 											create_by 
-										FROM goods_image 
+										FROM goods_images 
 										WHERE goods_id = ?`, id)
 
 	if err != nil {
@@ -74,7 +74,7 @@ func (s *GoodsImageService) CreateGoodsImage(goodsImage *root.GoodsImage) error 
 		return &customErr
 	}
 
-	stmt, err := tx.PrepareNamed(`INSERT INTO goods_image(goods_id, id, size, create_at, create_by))
+	stmt, err := tx.PrepareNamed(`INSERT INTO goods_images(goods_id, id, size, create_at, create_by))
 							  VALUES(:goods_id, :id, :size, :create_at, :create_by )`)
 	if err != nil {
 		customErr.Code = root.EDBPREPAREERROR
